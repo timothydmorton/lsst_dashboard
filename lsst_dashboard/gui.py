@@ -518,6 +518,8 @@ class QuickLookComponent(Component):
                 if dvisits[filt][metric] is not None:
                     df = dvisits[filt][metric].compute()
                     visits = visits.union(set(df['visit'].unique()))
+                else:
+                    print('---Skipping {}, {}---'.format(filt, metric))
         return len(visits)
 
     def update_info_counts(self):
