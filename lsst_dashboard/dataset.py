@@ -63,7 +63,7 @@ class Dataset():
         print('-- generate other metadata fields --')
         df = self.coadd['qaDashboardCoaddTable']
         self.flags = df.columns[df.dtypes == bool].to_list()
-        self.filters = df['filter'].unique().compute().to_list() # this takes some time, mightbe better to read from metadata file
+        self.filters = df['filter'].unique().to_list() # this takes some time, mightbe better to read from metadata file
         self.metrics = set(df.columns.to_list()) - set(self.flags) - set(['patch', 'dec', 'label', 'psfMag', 'ra', 'filter', 'dataset', 'tract'])
         print('-- read visit data --')
         self.fetch_visits()
@@ -83,7 +83,7 @@ class Dataset():
             df = dd.read_parquet(f, npartitions=4, engine='pyarrow').rename(columns={'patchId': 'patch'})
             df['tract'] = tract
             dfs.append(df)
-        self.coadd[table] = dd.concat(dfs)
+        self.coadd[table] = dd.concat(dfs).compute()
 
     def fetch_visits(self):
         table = 'qaDashboardVisitTable'
@@ -92,7 +92,8 @@ class Dataset():
         else:
             filenames = [str(self.path.join(f'{table}-{t}.parq')) for t in self.tracts]
 
-        self.visits = dd.read_parquet(filenames, npartitions=16, engine='pyarrow').rename(columns={'tractId': 'tract', 'visitId': 'visit', 'patchId': 'patch'})
+        ddf = dd.read_parquet(filenames, npartitions=16, engine='pyarrow')
+        self.visits = ddf.rename(columns={'tractId': 'tract', 'visitId': 'visit', 'patchId': 'patch'}).compute()
 
     def fetch_visits_by_metric(self):
         cols = self.visits.columns[self.visits.dtypes == bool].to_list() + ['dec', 'label', 'psfMag', 'ra', 'filter', 'tract', 'visit']

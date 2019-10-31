@@ -71,7 +71,7 @@ def init_dataset(data_repo_path, datastack='qaDashboardCoaddTable'):
     dtf = d.coadd[datastack]
     dtf = dtf.set_index('filter')
     for filt in d.filters:
-        df = dtf.loc[filt].compute()
+        df = dtf.loc[filt]
         datasets[filt] = QADataset(df)
         filtered_datasets[filt] = QADataset(df.copy())
 
@@ -515,7 +515,7 @@ class QuickLookComponent(Component):
         visits = set()
         for filt,metrics in self.selected_metrics_by_filter.items():
             for metric in metrics:
-                df = dvisits[filt][metric].compute()
+                df = dvisits[filt][metric]
                 visits = visits.union(set(df['visit'].unique()))
         return len(visits)
 
