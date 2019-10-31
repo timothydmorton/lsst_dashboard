@@ -63,7 +63,7 @@ class Dataset():
         print('-- generate other metadata fields --')
         df = self.coadd['qaDashboardCoaddTable']
         self.flags = df.columns[df.dtypes == bool].to_list()
-        self.filters = df['filter'].unique().to_list() # this takes some time, mightbe better to read from metadata file
+        self.filters = list(df['filter'].unique()) # this takes some time, mightbe better to read from metadata file
         self.metrics = set(df.columns.to_list()) - set(self.flags) - set(['patch', 'dec', 'label', 'psfMag', 'ra', 'filter', 'dataset', 'tract'])
         print('-- read visit data --')
         self.fetch_visits()
