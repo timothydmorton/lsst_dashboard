@@ -102,5 +102,5 @@ class Dataset():
             for metric in self.metrics:
                 visit_data = None
                 if metric in self.visits.columns:
-                    visit_data = self.visits.query(f'filter=={filt}')[[metric] + cols]
+                    visit_data = self.visits.query(f'filter=="{filt}"')[[metric] + cols]
                 self.visits_by_metric[filt][metric] = visit_data
