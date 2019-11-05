@@ -36,7 +36,7 @@ class Dataset():
         # 2. Look for datafolder in current directory i.e. './RC2_w18/metadata.yaml'
         # 3. Look for datafolder in dir specified in LSST_META env variable i.e. /user/name/lsst_meta/RC2_w18/metadata.yaml'
         #    when LSST_META='/user/name/lsst_meta'
-      
+
         print('-- read metadata file --')
         if self.path.joinpath(METADATA_FILENAME).exists():
             self.metadata_path = self.path.joinpath(METADATA_FILENAME)
@@ -63,7 +63,7 @@ class Dataset():
         print('-- generate other metadata fields --')
         df = self.coadd['qaDashboardCoaddTable']
         self.flags = df.columns[df.dtypes == bool].to_list()
-        self.filters = df['filter'].unique().compute().to_list() # this takes some time, mightbe better to read from metadata file
+        self.filters = self.metadata.get('filters')
         self.metrics = set(df.columns.to_list()) - set(self.flags) - set(['patch', 'dec', 'label', 'psfMag', 'ra', 'filter', 'dataset', 'tract'])
         print('-- read visit data --')
         self.fetch_visits()
@@ -75,12 +75,12 @@ class Dataset():
         if self.conn:
             filenames = [self.conn.get(table, tract=int(t)).filename for t in self.tracts]
         else:
-            filenames = [str(self.path.join(f'{table}-{t}.parq')) for t in self.tracts]
+            filenames = [os.path.join(str(self.path), f'{table}-{t}.parq') for t in self.tracts]
 
         # workaround for tract not reliably being in file:
         dfs = []
         for tract, f in zip(self.tracts, filenames):
-            df = dd.read_parquet(f, npartitions=4).rename(columns={'patchId': 'patch'})
+            df = dd.read_parquet(f, npartitions=4, engine='pyarrow').rename(columns={'patchId': 'patch'})
             df['tract'] = tract
             dfs.append(df)
         self.coadd[table] = dd.concat(dfs)
@@ -90,9 +90,8 @@ class Dataset():
         if self.conn:
             filenames = [self.conn.get(table, tract=int(t)).filename for t in self.tracts]
         else:
-            filenames = [str(self.path.join(f'{table}-{t}.parq')) for t in self.tracts]
-        
-        self.visits = dd.read_parquet(filenames, npartitions=16).rename(columns={'tractId': 'tract', 'visitId': 'visit', 'patchId': 'patch'})
+            filenames = [os.path.join(str(self.path), f'{table}-{t}.parq') for t in self.tracts]
+        self.visits = dd.read_parquet(filenames, npartitions=16, engine='pyarrow').rename(columns={'tractId': 'tract', 'visitId': 'visit', 'patchId': 'patch'})
 
     def fetch_visits_by_metric(self):
         cols = self.visits.columns[self.visits.dtypes == bool].to_list() + ['dec', 'label', 'psfMag', 'ra', 'filter', 'tract', 'visit']
@@ -101,5 +100,5 @@ class Dataset():
             for metric in self.metrics:
                 visit_data = None
                 if metric in self.visits.columns:
-                    visit_data = self.visits[(self.visits.filter==filt)][[metric] + cols] 
+                    visit_data = self.visits[(self.visits.filter==filt)][[metric] + cols]
                 self.visits_by_metric[filt][metric] = visit_data

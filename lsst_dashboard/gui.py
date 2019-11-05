@@ -515,8 +515,8 @@ class QuickLookComponent(Component):
         visits = set()
         for filt,metrics in self.selected_metrics_by_filter.items():
             for metric in metrics:
-                df = dvisits[filt][metric].compute()
-                visits = visits.union(set(df['visit'].unique()))
+                df = dvisits[filt][metric]
+                visits = visits.union(set(df['visit'].compute().unique()))
         return len(visits)
 
     def update_info_counts(self):

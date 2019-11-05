@@ -263,7 +263,8 @@ class scattersky(ParameterizedFunction):
                                aggregator=ds.mean(self.p.ydim)).options(colorbar=True,
                                                            responsive=True,
                                                            # cmap=cc.palette[self.p.sky_cmap])
-                                                           cmap=Viridis[256])
+                                                           cmap=Viridis[256],)
+                                                           # cmap=coolwarm)
         sky = sky_shaded.opts(**sky_opts)
         # sky = dynspread(sky_shaded).opts(**sky_opts)
 
