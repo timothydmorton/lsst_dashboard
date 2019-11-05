@@ -75,7 +75,7 @@ class Dataset():
         if self.conn:
             filenames = [self.conn.get(table, tract=int(t)).filename for t in self.tracts]
         else:
-            filenames = [os.path.join(str(self.path), f'{table}-{t}.parq') for t in self.tracts]
+            filenames = [str(self.path.joinpath(f'{table}-{t}.parq')) for t in self.tracts]
 
         # workaround for tract not reliably being in file:
         dfs = []
@@ -90,7 +90,8 @@ class Dataset():
         if self.conn:
             filenames = [self.conn.get(table, tract=int(t)).filename for t in self.tracts]
         else:
-            filenames = [os.path.join(str(self.path), f'{table}-{t}.parq') for t in self.tracts]
+            filenames = [str(self.path.joinpath(f'{table}-{t}.parq')) for t in self.tracts]
+
         self.visits = dd.read_parquet(filenames, npartitions=16, engine='pyarrow').rename(columns={'tractId': 'tract', 'visitId': 'visit', 'patchId': 'patch'})
 
     def fetch_visits_by_metric(self):
