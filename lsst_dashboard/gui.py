@@ -70,10 +70,13 @@ def init_dataset(data_repo_path, datastack='qaDashboardCoaddTable'):
     filtered_datasets = {}
     dtf = d.coadd[datastack]
     dtf = dtf.set_index('filter')
+    print('-- loading coadd tables into memory --')
     for filt in d.filters:
         df = dtf.loc[filt].compute()
         datasets[filt] = QADataset(df)
         filtered_datasets[filt] = QADataset(df.copy())
+        print(f'-- {filt} --')
+    print('-- done. --')
 
     datavisits = {}
     filtered_datavisits = {}
