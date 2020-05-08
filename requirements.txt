@@ -1,0 +1,7 @@
+--index-url https://test.pypi.org/simple/ holoviews==1.13.3a1
+panel==0.9.5 
+bokeh==2.0.0
+geopandas
+git+https://github.com/jrbourbeau/distributed.git@port-range
+dask-jobqueue==0.6.3
+kartothek
