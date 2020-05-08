@@ -8,15 +8,12 @@ After sourcing the current stack, set up the `tickets/DM-21335` branches of `qa_
 
 ### Install this package and various dependencies
 
-After the stack has been set up, install this package:
+After the stack has been set up, install this package and a number of dependencies:
 ```
 git clone https://github.com/quansight/lsst_dashboard
 cd lsst_dashboard
+pip install --user requirements.txt
 pip install --user -e .
-```
-and a number of dependencies via pip:
-```
-...
 ```
 
 ### Run `prepareQADashboard.py`
